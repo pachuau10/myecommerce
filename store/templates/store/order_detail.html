@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} — Chhohreivung{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 60px; padding-bottom: 100px; max-width: 800px;">
+  <div style="text-align: center; margin-bottom: 60px;">
+    <div style="font-size: 64px; margin-bottom: 24px;">✓</div>
+    <h1 style="font-family: var(--font-display); font-size: 48px; font-weight: 300; margin-bottom: 8px;">Order Confirmed</h1>
+    <p style="color: var(--text-muted);">Thank you, {{ order.shipping_name }}. Your order has been received.</p>
+  </div>
+
+  <div class="order-card">
+    <div class="order-header">
+      <div>
+        <div class="order-id">Order #{{ order.id }}</div>
+        <div class="order-date">Placed {{ order.created_at|date:"F d, Y" }}</div>
+      </div>
+      <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+    </div>
+
+    <!-- Items -->
+    {% for item in order.items.all %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 14px;">
+      <div>
+        <p style="font-family: var(--font-display); font-size: 18px;">{{ item.product.name }}</p>
+        <p style="color: var(--text-dim); font-size: 13px;">Qty: {{ item.quantity }} × ${{ item.price }}</p>
+      </div>
+      <p style="color: var(--accent);">${{ item.total|floatformat:2 }}</p>
+    </div>
+    {% endfor %}
+
+    <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 400; padding-top: 20px; margin-top: 4px;">
+      <span>Total</span>
+      <span style="color: var(--accent);">${{ order.total_price|floatformat:2 }}</span>
+    </div>
+  </div>
+
+  <!-- Shipping -->
+  <div class="order-card" style="margin-top: 16px;">
+    <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin-bottom: 16px;">Shipping To</h3>
+    <p>{{ order.shipping_name }}</p>
+    <p style="color: var(--text-muted);">{{ order.shipping_address }}, {{ order.shipping_city }}, {{ order.shipping_zip }}</p>
+  </div>
+
+  <div style="text-align: center; margin-top: 48px; display: flex; gap: 16px; justify-content: center;">
+    <a href="{% url 'store:order_list' %}" class="btn btn-outline">View All Orders</a>
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</div>
+{% endblock %}

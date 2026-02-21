@@ -1,0 +1,42 @@
+<div class="product-card">
+  <div class="product-card-image">
+    {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}
+      <div class="product-card-placeholder">{{ product.name|first }}</div>
+    {% endif %}
+    <div class="product-card-badges">
+      {% if product.is_new %}<span class="badge badge-new">New</span>{% endif %}
+      {% if product.discount_percent %}<span class="badge badge-sale">-{{ product.discount_percent }}%</span>{% endif %}
+      {% if not product.in_stock %}<span class="badge badge-sold-out">Sold Out</span>{% endif %}
+    </div>
+    <div class="product-card-actions">
+      {% if product.in_stock %}
+      <form method="post" action="{% url 'store:add_to_cart' product.id %}" style="flex: 1;">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">Add to Cart</button>
+      </form>
+      {% endif %}
+      {% if user.is_authenticated %}
+      <a href="{% url 'store:toggle_wishlist' product.id %}" class="btn btn-outline btn-sm">♡</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="product-card-info">
+    <div class="product-card-category">{{ product.category.name }}</div>
+    <a href="{{ product.get_absolute_url }}" class="product-card-name">{{ product.name }}</a>
+    <div class="product-card-price">
+      <span class="price-current">${{ product.price }}</span>
+      {% if product.compare_price %}<span class="price-compare">${{ product.compare_price }}</span>{% endif %}
+    </div>
+    {% with avg=product.average_rating count=product.reviews.count %}
+    {% if count > 0 %}
+    <div class="product-card-rating">
+      <span class="stars">{% for i in "12345" %}{% if forloop.counter <= avg %}★{% else %}☆{% endif %}{% endfor %}</span>
+      <span class="rating-count">({{ count }})</span>
+    </div>
+    {% endif %}
+    {% endwith %}
+  </div>
+</div>

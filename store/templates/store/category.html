@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} — Chhohreivung{% endblock %}
+{% block content %}
+<div class="container" style="padding-top: 60px; padding-bottom: 100px;">
+  <div class="page-hero" style="padding-top: 0; border-bottom: none; margin-bottom: 48px;">
+    <h1 class="page-title">{{ category.name }}</h1>
+    {% if category.description %}<p class="page-subtitle">{{ category.description }}</p>{% endif %}
+    <p class="page-subtitle">{{ products.count }} product{{ products.count|pluralize }}</p>
+  </div>
+
+  {% if products %}
+  <div class="product-grid product-grid-4">
+    {% for product in products %}
+    {% include 'store/partials/product_card.html' with product=product %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-title">No products here yet</div>
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse All</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

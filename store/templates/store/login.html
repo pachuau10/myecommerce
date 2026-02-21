@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Sign In — Chhohreivung{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-subtitle">Sign in to your Chhohreivung account</p>
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      {% if form.non_field_errors %}
+      <p class="form-error" style="margin-bottom: 16px;">{{ form.non_field_errors.0 }}</p>
+      {% endif %}
+      <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top: 8px;">Sign In</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="{% url 'store:register' %}">Create one</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

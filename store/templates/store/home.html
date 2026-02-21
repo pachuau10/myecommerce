@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chhohreivung — Premium Shop{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Chhohreivung Collection 2026</p>
+    <h1 class="hero-title">
+      Crafted<br>for the <em>bold</em>
+    </h1>
+    <p class="hero-subtitle">
+Every piece at Chhohreivung is chosen with care — built to last, designed to impress, and delivered straight to you.    </p>
+    <div class="hero-actions">
+      <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+      <a href="{% url 'store:product_list' %}?sort=newest" class="btn btn-outline btn-lg">New Arrivals</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<!-- Feature Strip -->
+<div class="feature-strip">
+  <div class="feature-strip-inner">
+    <div class="feature-item">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">Free Shipping</div>
+      <div class="feature-desc">On orders over $100</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◈</div>
+      <div class="feature-title">30-Day Returns</div>
+      <div class="feature-desc">No questions asked</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◉</div>
+      <div class="feature-title">Authenticity</div>
+      <div class="feature-desc">Verified premium goods</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">⬡</div>
+      <div class="feature-title">24/7 Support</div>
+      <div class="feature-desc">Always here for you</div>
+    </div>
+  </div>
+</div>
+
+<!-- Categories -->
+{% if categories %}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Browse by</p>
+        <h2 class="section-title">Categories</h2>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="section-link">View all →</a>
+    </div>
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a href="{{ cat.get_absolute_url }}" class="category-card">
+        <div class="category-card-bg" style="
+          {% if cat.image %}background-image: url('{{ cat.image.url }}'); background-size: cover; background-position: center;
+          {% else %}background: linear-gradient(135deg, hsl({{ forloop.counter0|add:200 }},20%,12%) 0%, hsl({{ forloop.counter0|add:220 }},25%,18%) 100%);
+          {% endif %}
+        "></div>
+        <div class="category-card-overlay">
+          <div>
+            <div class="category-card-name">{{ cat.name }}</div>
+            <div class="category-card-count">{{ cat.products.count }} items</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Featured Products -->
+{% if featured %}
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Curated</p>
+        <h2 class="section-title">Featured</h2>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="section-link">Shop all →</a>
+    </div>
+    <div class="product-grid product-grid-4">
+      {% for product in featured %}
+      {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- New Arrivals -->
+{% if new_arrivals %}
+<section class="section" style="background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 80px 0;">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Just In</p>
+        <h2 class="section-title">New Arrivals</h2>
+      </div>
+      <a href="{% url 'store:product_list' %}?sort=newest" class="section-link">See all →</a>
+    </div>
+    <div class="product-grid product-grid-4">
+      {% for product in new_arrivals %}
+      {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CTA Banner -->
+<section style="padding: 120px 0; text-align: center; position: relative; overflow: hidden;">
+  <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 600px 400px at center, rgba(201,169,110,0.08) 0%, transparent 70%);"></div>
+  <div class="container" style="position: relative;">
+    <p class="section-eyebrow" style="text-align:center; margin-bottom: 16px;">Membership</p>
+    <h2 style="font-family: var(--font-display); font-size: clamp(48px, 6vw, 80px); font-weight: 300; margin-bottom: 20px; letter-spacing: -0.02em;">Join the inner circle</h2>
+    <p style="font-size: 16px; color: var(--text-muted); max-width: 480px; margin: 0 auto 40px; line-height: 1.7;">Get early access to new arrivals, exclusive offers, and members-only pricing.</p>
+    {% if not user.is_authenticated %}
+    <a href="{% url 'store:register' %}" class="btn btn-primary btn-lg">Create Account</a>
+    {% else %}
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

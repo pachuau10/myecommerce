@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Create Account — Chhohreivung{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <h1 class="auth-title">Join LUXE</h1>
+    <p class="auth-subtitle">Create your account to start shopping</p>
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<p style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top: 8px;">Create Account</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a href="{% url 'store:login' %}">Sign in</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} — Chhohreivung{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 48px; padding-bottom: 80px;">
+
+  <!-- Breadcrumb -->
+  <div class="product-breadcrumb">
+    <a href="{% url 'store:home' %}">Home</a>
+    <span>›</span>
+    <a href="{% url 'store:product_list' %}">Shop</a>
+    <span>›</span>
+    <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+    <span>›</span>
+    <span>{{ product.name }}</span>
+  </div>
+
+  <div class="product-detail-grid">
+
+    <!-- Images -->
+    <div class="product-images">
+      <div class="product-main-image">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainImg">
+        {% else %}
+          <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family: var(--font-display); font-size: 120px; color: var(--text-dim);">{{ product.name|first }}</div>
+        {% endif %}
+      </div>
+      {% if product.image2 or product.image %}
+      <div class="product-thumbnails">
+        {% if product.image %}
+        <div class="product-thumb active">
+          <img src="{{ product.image.url }}" alt="Main" onclick="document.getElementById('mainImg').src=this.src">
+        </div>
+        {% endif %}
+        {% if product.image2 %}
+        <div class="product-thumb">
+          <img src="{{ product.image2.url }}" alt="Alt" onclick="document.getElementById('mainImg').src=this.src">
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div class="product-info">
+      <div class="product-category-tag">{{ product.category.name }}</div>
+      <h1 class="product-title">{{ product.name }}</h1>
+
+      <div class="product-pricing">
+        <span class="product-price">${{ product.price }}</span>
+        {% if product.compare_price %}
+        <span class="product-compare">${{ product.compare_price }}</span>
+        <span class="product-discount">Save {{ product.discount_percent }}%</span>
+        {% endif %}
+      </div>
+
+      {% with avg=product.average_rating count=product.reviews.count %}
+      {% if count > 0 %}
+      <div class="product-card-rating" style="margin-top: 8px;">
+        <span class="stars" style="font-size: 15px;">{% for i in "12345" %}{% if forloop.counter <= avg %}★{% else %}☆{% endif %}{% endfor %}</span>
+        <span class="rating-count">{{ avg }} ({{ count }} review{{ count|pluralize }})</span>
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <hr class="product-divider">
+
+      <p class="product-description">{{ product.description }}</p>
+
+      {% if product.in_stock %}
+      <p class="stock-info in-stock">✓ In Stock ({{ product.stock }} available)</p>
+
+      <form method="post" action="{% url 'store:add_to_cart' product.id %}">
+        {% csrf_token %}
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+          <label style="font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted);">Qty</label>
+          <div class="qty-selector">
+            <button type="button" class="qty-btn" data-action="minus">−</button>
+            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+            <button type="button" class="qty-btn" data-action="plus">+</button>
+          </div>
+        </div>
+        <div class="product-actions">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Add to Cart</button>
+          {% if user.is_authenticated %}
+          <a href="{% url 'store:toggle_wishlist' product.id %}" class="btn btn-outline" style="min-width: 52px;">{% if in_wishlist %}♥{% else %}♡{% endif %}</a>
+          {% endif %}
+        </div>
+      </form>
+      {% else %}
+      <p class="stock-info out-of-stock">✗ Out of Stock</p>
+      {% if user.is_authenticated %}
+      <a href="{% url 'store:toggle_wishlist' product.id %}" class="btn btn-outline btn-lg" style="margin-top: 16px;">{% if in_wishlist %}♥ Saved{% else %}♡ Save to Wishlist{% endif %}</a>
+      {% endif %}
+      {% endif %}
+
+      <hr class="product-divider">
+
+      <div style="display: grid; gap: 12px;">
+        <div style="display: flex; gap: 12px; font-size: 13px; color: var(--text-dim);">
+          <span>✦</span><span>Free shipping on orders over $100</span>
+        </div>
+        <div style="display: flex; gap: 12px; font-size: 13px; color: var(--text-dim);">
+          <span>◈</span><span>30-day hassle-free returns</span>
+        </div>
+        <div style="display: flex; gap: 12px; font-size: 13px; color: var(--text-dim);">
+          <span>◉</span><span>Authenticity guaranteed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div style="margin-top: 100px; padding-top: 60px; border-top: 1px solid var(--border);">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Customer</p>
+        <h2 class="section-title">Reviews</h2>
+      </div>
+    </div>
+
+    {% if reviews %}
+      {% for review in reviews %}
+      <div class="review-item">
+        <div class="review-header">
+          <div>
+            <span class="review-user">{{ review.user.username }}</span>
+            <div style="margin-top: 4px;">
+              <span class="stars">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+            </div>
+          </div>
+          <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+        </div>
+        <p class="review-text">{{ review.comment }}</p>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: var(--text-dim); font-style: italic;">No reviews yet. Be the first!</p>
+    {% endif %}
+
+    <!-- Review Form -->
+    {% if user.is_authenticated and not user_review %}
+    <div style="margin-top: 48px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px;">
+      <h3 style="font-family: var(--font-display); font-size: 24px; font-weight: 400; margin-bottom: 24px;">Write a Review</h3>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Rating</label>
+          {{ review_form.rating }}
+        </div>
+        <div class="form-group">
+          <label>Your Review</label>
+          {{ review_form.comment }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    </div>
+    {% elif not user.is_authenticated %}
+    <div style="margin-top: 32px; text-align: center; padding: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+      <p style="color: var(--text-muted); margin-bottom: 16px;"><a href="{% url 'store:login' %}" style="color: var(--accent);">Sign in</a> to leave a review.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Related Products -->
+{% if related %}
+<div class="related-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">You may also like</p>
+        <h2 class="section-title">Related</h2>
+      </div>
+    </div>
+    <div class="product-grid product-grid-4">
+      {% for p in related %}
+      {% include 'store/partials/product_card.html' with product=p %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
